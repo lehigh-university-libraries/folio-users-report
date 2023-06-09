@@ -3,17 +3,9 @@
   - Users read-only permissions
 */
 
-// const ITEM_BARCODE_COLUMN = 'D';
-// const INSTANCE_UUID_COLUMN = 'K';
-// const LAST_COLUMN = 'L';
-// const SOURCE_ID_FOLIO = "f32d531e-df79-46b3-8932-cdd35f7a2264";
-// const STATISTICAL_CODE_RETENTION_AGREEMENT = "ba16cd17-fb83-4a14-ab40-23c7ffa5ccb5";
-
 function testGenerateReport() {
     generateReport({
       'environment': 'prod',
-    //   'start_row': 2,
-    //   'end_row': 6
     });
 }
 
@@ -58,7 +50,6 @@ function loadPermissionUsers() {
 
     // Query all users with any linked permissions object
     let permissionUsersQuery = FOLIOAUTHLIBRARY.getBaseOkapi(config.environment) + 
-        // '/perms/users?limit=100000';
         '/perms/users?limit=100000';
     console.log("Loading users with query: ", permissionUsersQuery);
     let getOptions = FOLIOAUTHLIBRARY.getHttpGetOptions();
@@ -91,7 +82,6 @@ function loadUser(permissionUser) {
     let getOptions = FOLIOAUTHLIBRARY.getHttpGetOptions();
     let response = UrlFetchApp.fetch(userQuery, getOptions);
     if (response.getResponseCode() != 200) {
-        // throw new Error("Cannot get user record, response: " + response);
         console.error("Cannot get user record for " + permissionUser.userId + ", response: " + response);
         return null;
     }
