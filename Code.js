@@ -3,6 +3,8 @@
   - Users read-only permissions
 */
 
+var PERMISSIONS;
+
 function testGenerateReport() {
     generateReport({
       'environment': 'prod',
@@ -41,8 +43,42 @@ function generateReport(config) {
     range.clearFormat();
 
     authenticate(config);
+
+    loadAndIndexPermissions();
+
     let permissionUsers = loadPermissionUsers();
     updateSheet(permissionUsers);
+}
+
+function loadAndIndexPermissions() {
+    let permissions = loadPermissions();
+    let permissionsMap = {};
+    permissions.forEach(function(permission, index) {
+        permissionsMap[permission.id] = permission.displayName;
+    });
+    PERMISSIONS = permissionsMap;
+    // PropertiesService.getScriptProperties().setProperty("permissions", JSON.stringify(permissionsMap));
+}
+
+function loadPermissions() {
+    let config = JSON.parse(PropertiesService.getScriptProperties().getProperty("config"));
+
+    // Query all users with any linked permissions object
+    let permissionsQuery = FOLIOAUTHLIBRARY.getBaseOkapi(config.environment) + 
+        '/perms/permissions?limit=100000';
+    console.log("Loading permissions with query: ", permissionsQuery);
+    let getOptions = FOLIOAUTHLIBRARY.getHttpGetOptions();
+    let response = UrlFetchApp.fetch(permissionsQuery, getOptions);
+    if (response.getResponseCode() != 200) {
+        throw new Error("Cannot get permissions records, response: " + response);
+    }
+
+    // Parse response
+    let responseText = response.getContentText();
+    let responseObject = JSON.parse(responseText);
+    let permissions = responseObject.permissions;
+    
+    return permissions;
 }
 
 function loadPermissionUsers() {
@@ -134,8 +170,16 @@ function getUserValues(permissionUser) {
         user.id,
         user.personal.firstName,
         user.personal.lastName,
-        permissionUser.permissions,
+        getPermissionValues(permissionUser.permissions),
     ];
     return userValues;
 }
 
+function getPermissionValues(userPermissions) {   
+    let values = [];
+    userPermissions.forEach(function(userPermission, index) {
+        let value = PERMISSIONS[userPermission] ?? userPermission;
+        values.push(value);
+    });
+    return values.toString();
+}
