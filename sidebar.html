@@ -1,0 +1,105 @@
+<html>
+
+<head>
+
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+
+  <style type="text/css">
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #445460;
+    }
+
+    label, legend {
+      color: white;
+      font-weight: bold;
+    }
+
+    #environment div {
+      display: inline-block;
+    }
+
+    #environment div:not(:last-child) {
+      margin-right: 30px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="sidebar">
+    <form name="inventoryInfo" id="inventoryInfo">
+
+      <fieldset id="environment">
+        <legend>Environment</legend>
+        <div class="form-group">
+          <input type="radio" id="env_test" value="test" name="environment">
+          <label for="env_test">Test</label>
+        </div>
+        <div class="form-group">
+          <input type="radio" id="env_prod" value="prod" name="environment">
+          <label for="env_prod">Production</label>
+        </div>
+      </fieldset>
+      <br />
+
+      <div class="block form-group">
+        <input type="button" class="action" id="submit" value="Load User Permissions" disabled="disabled" onclick="generateReport()" />
+      </div>
+      <br />
+
+    </form>
+
+    <!-- Load the jQuery library from the Google CDN -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+
+
+    <script>
+      $("#environment input[type=radio]").click(function() {
+        checkReadyToSubmit();
+      });
+      $("input[type=text]").keyup(function() {
+        checkReadyToSubmit();
+      })
+
+      function checkReadyToSubmit() {
+        if ($("#environment input[type=radio]:checked").size() > 0) {
+          $("#submit").removeAttr("disabled");
+          var i = 1/0;
+        }
+        else {
+          $("#submit").attr("disabled", "disabled");
+        }
+      }
+
+      function generateReport() {
+        function onSuccess() {
+          console.info("Finished successfully.");
+          $("#submit").removeAttr("disabled");
+        }
+
+        function onFailure(error) {
+          console.log("Failed with error: ", error);
+          alert("Failed with error: " + error);
+          $("#submit").removeAttr("disabled");
+        }
+
+        $("#submit").attr("disabled", "disabled");
+        let environment = $("#environment input[type=radio]:checked").val();
+        let orders = google.script.run
+          .withSuccessHandler(onSuccess)
+          .withFailureHandler(onFailure)
+          .generateReport({
+            'environment': environment,
+          });
+      }
+
+    </script>
+
+  </div>
+
+</body>
+
+</html>

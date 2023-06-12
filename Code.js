@@ -20,7 +20,7 @@ function onOpen() {
   
 function showSidebar() {  // eslint-disable-line no-unused-vars
     var html = HtmlService.createHtmlOutputFromFile('sidebar')
-      .setTitle('Create Holdings and Bound-with Parts')
+      .setTitle('Load User Permissions')
       .setWidth(500);
     SpreadsheetApp.getUi()
       .showSidebar(html);
